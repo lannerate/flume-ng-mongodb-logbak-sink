@@ -1,7 +1,9 @@
-flume-ng-mongodb-sink
+flume-ng-mongodb-logbak-sink
 =============
-Flume NG MongoDB sink. The source was implemented to populate JSON into MongoDB.
-
+Flume NG MongoDB sink.
+the feature:
+1. The source was implemented to populate JSON into MongoDB.
+2. The source was implemented to "tail -f stdout.log" into MongoDB.
 
 ## Getting Started
 - - -
@@ -41,18 +43,25 @@ Flume NG MongoDB sink. The source was implemented to populate JSON into MongoDB.
     authenticationEnabled: true means login by username/password, false means login without authentication [false]
     username: required when "authenticationEnabled" is true []
     password: required when "authenticationEnabled" is true []
+    pattern :the logbak pattern, as the your app log's pattern :
+            for example:
+            %d{yyyy/MM/dd HH:mm:ss} %-5p LINE[%L] %c - %msg%n
 
 ### flume.conf sample
 - - -
 	agent2.sources = source2
 	agent2.channels = channel2
 	agent2.sinks = sink2
-	
-	agent2.sources.source2.type = org.riderzen.flume.source.MsgPackSource
-	agent2.sources.source2.bind = localhost
-	agent2.sources.source2.port = 1985
-	
-	agent2.sources.source2.channels = channel2
+
+	#json event
+	#agent2.sources.source2.type = org.riderzen.flume.source.MsgPackSource
+	#agent2.sources.source2.bind = localhost
+	#agent2.sources.source2.port = 1985
+
+	#tail -f log
+    agent2.sources.source2.type = exec
+    agent2.sources.source2.command = tail -f /weblogs/stdout.log
+   	agent2.sources.source2.channels = channel2
 	
 	agent2.sinks.sink2.type = org.riderzen.flume.sink.MongoSink
 	agent2.sinks.sink2.host = localhost
@@ -65,7 +74,7 @@ Flume NG MongoDB sink. The source was implemented to populate JSON into MongoDB.
 	
 	agent2.channels.channel2.type = memory
 	agent2.channels.channel2.capacity = 1000000
-	agent2.channels.channel2.transactionCapacity = 800
+	agent2.channels.channel2.transactionCapacity = 1000000
 	agent2.channels.channel2.keep-alive = 3
 
 ### Event Headers
