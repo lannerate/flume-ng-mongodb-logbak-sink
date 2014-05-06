@@ -1,11 +1,11 @@
 flume-ng-mongodb-logbak-sink
 =============
 Flume NG MongoDB sink.
-
 the features:
+- - -
 1. The source was implemented to populate JSON into MongoDB.
 2. The source was implemented to "tail -f stdout.log" into MongoDB.
-
+- - -
 ## Getting Started
 - - -
 1. Clone the repository
