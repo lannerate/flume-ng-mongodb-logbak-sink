@@ -5,7 +5,7 @@ Flume NG MongoDB sink.
 ## The Features:
 - - -
 1. The source was implemented to populate JSON into MongoDB.
-2. The source was implemented to "tail -f stdout.log" into MongoDB.
+2. The source was implemented to "tail -F stdout.log" into MongoDB.
 
 ## Getting Started
 - - -
