@@ -61,9 +61,9 @@ Flume NG MongoDB sink.
 	#agent2.sources.source2.port = 1985
 
 	#tail -f log
-        agent2.sources.source2.type = exec
-        agent2.sources.source2.command = tail -F /weblogs/stdout.log
-    	agent2.sources.source2.channels = channel2
+    agent2.sources.source2.type = exec
+    agent2.sources.source2.command = tail -F /weblogs/stdout.log
+    agent2.sources.source2.channels = channel2
 	
 	agent2.sinks.sink2.type = org.riderzen.flume.sink.MongoSink
 	agent2.sinks.sink2.host = localhost
