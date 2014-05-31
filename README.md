@@ -6,7 +6,7 @@ Flume NG MongoDB sink.
 - - -
 1. The source was implemented to populate JSON into MongoDB.
 2. The source was implemented to "tail -f stdout.log" into MongoDB.
-- - -
+
 ## Getting Started
 - - -
 1. Clone the repository
@@ -61,9 +61,9 @@ Flume NG MongoDB sink.
 	#agent2.sources.source2.port = 1985
 
 	#tail -f log
-    agent2.sources.source2.type = exec
-    agent2.sources.source2.command = tail -f /weblogs/stdout.log
-   	agent2.sources.source2.channels = channel2
+        agent2.sources.source2.type = exec
+        agent2.sources.source2.command = tail -F /weblogs/stdout.log
+    	agent2.sources.source2.channels = channel2
 	
 	agent2.sinks.sink2.type = org.riderzen.flume.sink.MongoSink
 	agent2.sinks.sink2.host = localhost
@@ -76,7 +76,7 @@ Flume NG MongoDB sink.
 	
 	agent2.channels.channel2.type = memory
 	agent2.channels.channel2.capacity = 1000000
-	agent2.channels.channel2.transactionCapacity = 1000000
+	agent2.channels.channel2.transactionCapacity = 800
 	agent2.channels.channel2.keep-alive = 3
 
 ### Event Headers
