@@ -1,3 +1,4 @@
+
 import com.mongodb.Mongo;
 import org.apache.flume.*;
 import org.apache.flume.channel.MemoryChannel;
@@ -16,9 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: guoqiang.li
- * Date: 12-9-12
- * Time: 下午3:31
+ * Created with IntelliJ IDEA.
+ * User: hui.zhang
+ * Date: 14-9-13
+ * Time: 下午4:23
+ * To change this template use File | Settings | File Templates.
  */
 @Test(singleThreaded = true, threadPoolSize = 1)
 public class MongoSinkTest {

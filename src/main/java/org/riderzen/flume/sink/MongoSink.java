@@ -22,9 +22,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * User: guoqiang.li
- * Date: 12-9-12
- * Time: 下午3:31
+ * Created with IntelliJ IDEA.
+ * User: hui.zhang
+ * Date: 14-9-13
+ * Time: 下午4:23
+ * To change this template use File | Settings | File Templates.
  */
 public class MongoSink extends AbstractSink implements Configurable {
     private static Logger logger = LoggerFactory.getLogger(MongoSink.class);
