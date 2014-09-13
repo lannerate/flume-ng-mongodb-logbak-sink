@@ -69,7 +69,7 @@ public class MongoSink extends AbstractSink implements Configurable {
     public static final String AUTO_WRAP = "autoWrap";
     public static final String WRAP_FIELD = "wrapField";
     public static final String TIMESTAMP_FIELD = "timestamp";
-//    public static final String TIMESTAMP_FIELD = "timestampField";
+    //    public static final String TIMESTAMP_FIELD = "timestampField";
     public static final String OPERATION = "op";
     public static final String PK = "_id";
     public static final String OP_INC = "$inc";
@@ -189,32 +189,34 @@ public class MongoSink extends AbstractSink implements Configurable {
 
         for (String eventCollection : eventMap.keySet()) {
             List<DBObject> docs = eventMap.get(eventCollection);
-            if (logger.isDebugEnabled()) {
-                logger.debug("collection: {}, length: {}", eventCollection, docs.size());
-            }
-            int separatorIndex = eventCollection.indexOf(NAMESPACE_SEPARATOR);
-            String eventDb = eventCollection.substring(0, separatorIndex);
-            String collectionName = eventCollection.substring(separatorIndex + 1);
+            if(null!=docs && docs.size()>0){
+                if (logger.isDebugEnabled()) {
+                    logger.debug("collection: {}, length: {}", eventCollection, docs.size());
+                }
+                int separatorIndex = eventCollection.indexOf(NAMESPACE_SEPARATOR);
+                String eventDb = eventCollection.substring(0, separatorIndex);
+                String collectionName = eventCollection.substring(separatorIndex + 1);
 
-            //Warning: please change the WriteConcern level if you need high datum consistence.
-            DB db = mongo.getDB(eventDb);
-            if (authentication_enabled) {
-                boolean authResult = db.authenticate(username, password.toCharArray());
-                if (!authResult) {
-                    logger.error("Failed to authenticate user: " + username + " with password: " + password + ". Unable to write events.");
-                    return;
+                //Warning: please change the WriteConcern level if you need high datum consistence.
+                DB db = mongo.getDB(eventDb);
+                if (authentication_enabled) {
+                    boolean authResult = db.authenticate(username, password.toCharArray());
+                    if (!authResult) {
+                        logger.error("Failed to authenticate user: " + username + " with password: " + password + ". Unable to write events.");
+                        return;
+                    }
                 }
-            }
-            CommandResult result = db.getCollection(collectionName).insert(docs, WriteConcern.NORMAL).getLastError();
-            if (result.ok()) {
-                String errorMessage = result.getErrorMessage();
-                if (errorMessage != null) {
-                    logger.error("can't insert documents with error: {} ", errorMessage);
-                    logger.error("with exception", result.getException());
-                    throw new MongoException(errorMessage);
+                CommandResult result = db.getCollection(collectionName).insert(docs, WriteConcern.NORMAL).getLastError();
+                if (result.ok()) {
+                    String errorMessage = result.getErrorMessage();
+                    if (errorMessage != null) {
+                        logger.error("can't insert documents with error: {} ", errorMessage);
+                        logger.error("with exception", result.getException());
+                        throw new MongoException(errorMessage);
+                    }
+                } else {
+                    logger.error("can't get last error");
                 }
-            } else {
-                logger.error("can't get last error");
             }
         }
     }
@@ -257,7 +259,7 @@ public class MongoSink extends AbstractSink implements Configurable {
             tx.commit();
         } catch (Exception e) {
             logger.error("can't process events, drop it!", e);
-           if (tx != null) {
+            if (tx != null) {
                 tx.commit();// commit to drop bad event, otherwise it will enter dead loop.
             }else{
                 tx.close();
@@ -270,6 +272,11 @@ public class MongoSink extends AbstractSink implements Configurable {
             }
         }
         return status;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     private void doUpsert(Map<String, List<DBObject>> eventMap) {
@@ -388,8 +395,8 @@ public class MongoSink extends AbstractSink implements Configurable {
 //                    final String PATT = "%d{yyyy/MM/dd HH:mm:ss} %-5p LINE[%L] %c - %msg%n";
                     Decoder decoder = DecoderLocal.getInstance(pattern);
                     StaticLoggingEvent loggingEvent = (StaticLoggingEvent)decoder.decode(new String(body)+"\n");
-                    if(null!=loggingEvent){
-                        eventJson = new BasicDBObject(LOG_TIMESTAMP,loggingEvent.getTimeStamp());
+                    if(null!=loggingEvent&&null!=loggingEvent.getLevel()){
+                        eventJson = new BasicDBObject(LOG_TIMESTAMP,new Date(loggingEvent.getTimeStamp()));
                         eventJson.put(LOG_LEVEL,loggingEvent.getLevel().toString());
                         eventJson.put(LOG_CLASSNAME,loggingEvent.getLoggerName());
                         eventJson.put(LOG_MESSAGE,loggingEvent.getMessage());
@@ -402,26 +409,28 @@ public class MongoSink extends AbstractSink implements Configurable {
                 return documents;
             }
         }
-        if (!event.getHeaders().containsKey(OPERATION) && timestampField != null) {
-            Date timestamp;
-            if (eventJson.containsField(timestampField)) {
-                try {
-                    String dateText = (String) eventJson.get(timestampField);
-                    timestamp = dateTimeFormatter.parseDateTime(dateText).toDate();
-                    eventJson.removeField(timestampField);
-                } catch (Exception e) {
-                    logger.error("can't parse date ", e);
 
+        if(null!=eventJson){
+            if (!event.getHeaders().containsKey(OPERATION) && timestampField != null) {
+                Date timestamp;
+                if (eventJson.containsField(timestampField)) {
+                    try {
+                        String dateText = (String) eventJson.get(timestampField);
+                        timestamp = dateTimeFormatter.parseDateTime(dateText).toDate();
+                        eventJson.removeField(timestampField);
+                    } catch (Exception e) {
+                        logger.error("can't parse date ", e);
+
+                        timestamp = new Date();
+                    }
+                } else {
                     timestamp = new Date();
                 }
-            } else {
-                timestamp = new Date();
+                eventJson.put(timestampField, timestamp);
             }
-            eventJson.put(timestampField, timestamp);
+
+            documents.add(eventJson);
         }
-
-        documents.add(eventJson);
-
         return documents;
     }
 
