@@ -83,3 +83,6 @@ Flume NG MongoDB sink.
     The sink supports some headers in dynamic model:
     'db': db name
     'collection' : collection name
+    
+## APACHE LICENSE, VERSION 2.0
+https://www.apache.org/licenses/LICENSE-2.0
